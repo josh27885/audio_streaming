@@ -7,8 +7,16 @@ workflows:
     scripts:
       - name: Get Flutter packages
         script: flutter pub get
+      
+      # NEW STEP: This forcefully strips the code signing requirement out of the Apple project files
+      - name: Force Xcode to skip code signing
+        script: |
+          sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' ios/Runner.xcodeproj/project.pbxproj
+          sed -i '' 's/CODE_SIGN_IDENTITY = "Apple Development";/CODE_SIGN_IDENTITY = "";/g' ios/Runner.xcodeproj/project.pbxproj
+      
       - name: Build iOS App
         script: flutter build ios --release --no-codesign
+      
       - name: Package into IPA
         script: |
           mkdir -p build/ios/iphoneos/Payload
